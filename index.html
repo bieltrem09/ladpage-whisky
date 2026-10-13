@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Halvorn — Single Malt 18 Anos</title>
+  <meta name="description" content="Halvorn Single Malt 18 Anos. Destilado duas vezes em alambiques de cobre, envelhecido por dezoito invernos em barris de carvalho tostado nas Highlands escocesas.">
+  <meta name="theme-color" content="#0B0A09">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230B0A09'/%3E%3Ctext x='16' y='24' font-family='Georgia,serif' font-style='italic' font-size='22' text-anchor='middle' fill='%23C8761E'%3EH%3C/text%3E%3C/svg%3E">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="Halvorn — Single Malt 18 Anos">
+  <meta property="og:description" content="Dezoito anos no escuro. Um filme sobre tempo, fogo e carvalho.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/bieltrem09/ladpage-whisky/main/img/watermarked_img_656600401022554758.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=Bodoni+Moda:ital,opsz,wght@1,6..96,400..600&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="img/watermarked_img_656600401022554758.jpg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="is-loading">
+
+  <!-- ==========================================================
+       Filtros SVG compartilhados
+       - f-mblur: motion blur vertical (só eixo Y) usado na cena 10
+       - f-blob : líquido orgânico das caixas do ritual (cena 13)
+       ========================================================== -->
+  <svg class="svg-defs" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="f-mblur" x="-10%" y="-60%" width="120%" height="220%">
+        <feGaussianBlur id="f-mblur-blur" in="SourceGraphic" stdDeviation="0 0" />
+      </filter>
+      <filter id="f-blob" x="-30%" y="-60%" width="160%" height="220%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035 0.06" numOctaves="2" seed="7" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="16" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <noscript>
+    <div class="noscript">Esta experiência precisa de JavaScript. <em>Halvorn</em> — Single Malt 18 Anos.</div>
+  </noscript>
+
+  <!-- ==========================================================
+       CENA 1 — Preloader + verificação de idade
+       ========================================================== -->
+  <div class="preloader" id="preloader">
+    <img class="pre-bg" data-img="sparks" alt="" aria-hidden="true">
+    <p class="pre-pill micro" data-t="pre.pill"></p>
+
+    <div class="pre-center">
+      <div class="pre-load" aria-live="polite">
+        <span class="pre-count" id="pre-count">000</span>
+        <span class="pre-bar"><span class="pre-bar-fill" id="pre-bar"></span></span>
+      </div>
+
+      <div class="pre-gate" id="pre-gate" hidden>
+        <h2 class="pre-question type-mix" data-t="pre.question"></h2>
+        <div class="pre-actions">
+          <button class="btn-min" id="age-yes" type="button" data-t="pre.yes"></button>
+          <button class="btn-min" id="age-no" type="button" data-t="pre.no"></button>
+        </div>
+        <p class="pre-deny" id="pre-deny" data-t="pre.deny" hidden></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flash de cor sólida (corte de edição) -->
+  <div class="flash" id="flash" aria-hidden="true"></div>
+
+  <!-- ==========================================================
+       Interface fixa
+       ========================================================== -->
+  <div class="hud" id="hud">
+    <a class="hud-logo" href="#" aria-label="Halvorn Single Malt — voltar ao início">
+      <span class="hud-logo-a">Halvorn</span>
+      <span class="hud-logo-b">SINGLE MALT</span>
+    </a>
+
+    <button class="hud-sound micro" id="sound-btn" type="button" aria-pressed="false">
+      <span class="hud-sound-bars" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span id="sound-label">SOM OFF</span>
+    </button>
+
+    <div class="hud-counter micro" aria-hidden="true"><span id="hud-index">02</span> / <span id="hud-total">18</span></div>
+
+    <div class="hud-caption micro" aria-live="polite">
+      <span class="hud-caption-inner" id="hud-caption">
+        <span class="hud-caption-a" id="hud-cap-a"></span>
+        <span class="hud-caption-b" id="hud-cap-b"></span>
+      </span>
+    </div>
+
+  </div>
+  <div class="hud-progress" aria-hidden="true"><span class="hud-progress-fill" id="hud-progress"></span></div>
+
+  <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label micro">OLHE</span></div>
+  <div class="grain" id="grain" aria-hidden="true"></div>
+
+  <!-- ==========================================================
+       O PALCO: todas as cenas ficam empilhadas aqui dentro.
+       O palco é fixo; o scroll só move a agulha da timeline.
+       ========================================================== -->
+  <main class="stage" id="stage">
+
+    <!-- CENAS 2 + 3 — Hero e letreiro (compartilham a mesma foto) -->
+    <section class="scene scene--open" id="s-open" aria-labelledby="hero-title">
+      <div class="open-block">
+        <div class="hero-glow" aria-hidden="true"></div>
+
+        <div class="marquee marquee--top" aria-hidden="true">
+          <div class="marquee-move"><div class="marquee-track" data-t="marquee.top"></div></div>
+        </div>
+        <div class="marquee marquee--bottom" aria-hidden="true">
+          <div class="marquee-move"><div class="marquee-track" data-t="marquee.bottom"></div></div>
+        </div>
+
+        <!-- cópia de trás do título (fica atrás da foto) -->
+        <div class="hero-type hero-type--back" aria-hidden="true">
+          <div class="hero-title" data-hero-letters></div>
+          <p class="hero-sub type-it is-ghost">&nbsp;</p>
+        </div>
+
+        <div class="open-media" data-cursor="olhe">
+          <div class="om-inner">
+            <img class="om-img om-hero" data-img="hero" data-alt="alt.hero" alt="">
+            <img class="om-img om-cellar" data-img="cellar" data-alt="alt.cellar" alt="">
+            <img class="om-img om-glass" data-img="glass" data-alt="alt.glass" alt="">
+            <div class="om-flash" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <!-- cópia da frente: mascarada no centro para a foto "cobrir" algumas letras -->
+        <div class="hero-type hero-type--front">
+          <h1 class="hero-title" id="hero-title" data-hero-letters></h1>
+          <p class="hero-sub type-it" data-t="hero.sub"></p>
+        </div>
+
+        <svg class="cut-line" aria-hidden="true">
+          <line pathLength="1" />
+        </svg>
+      </div>
+    </section>
+
+    <!-- CENA 4 — Manifesto -->
+    <section class="scene scene--manifesto" id="s-manifesto" aria-label="Manifesto">
+      <div class="mf-block" id="mf-block"></div>
+      <div class="mf-curtain" aria-hidden="true"><div class="mf-block mf-block--copy" id="mf-copy"></div></div>
+    </section>
+
+    <!-- CENA 5 — Galeria clara -->
+    <section class="scene scene--light scene--gallery" id="s-gallery">
+      <div class="scene-bg"></div>
+      <h2 class="g-title type-mix" data-t="gallery.title"></h2>
+      <p class="g-text micro" data-t="gallery.text"></p>
+      <div class="g-photos" id="g-photos"></div>
+      <div class="g-quote">
+        <span class="g-quote-line" aria-hidden="true"></span>
+        <p class="g-quote-text type-it" data-t="gallery.quote"></p>
+      </div>
+    </section>
+
+    <!-- CENA 6 — Olhe de perto -->
+    <section class="scene scene--light scene--zoom" id="s-zoom">
+      <div class="scene-bg"></div>
+      <h2 class="z-title type-mix" data-t="zoom.title"></h2>
+      <div class="z-card">
+        <img class="z-img" data-img="drop" data-alt="alt.drop" alt="">
+      </div>
+    </section>
+
+    <!-- CENA 7 — Revelação líquida -->
+    <section class="scene scene--reveal" id="s-reveal" data-cursor="olhe">
+      <div class="rv-media">
+        <canvas class="rv-canvas" id="rv-canvas" aria-hidden="true"></canvas>
+        <div class="rv-fallback" id="rv-fallback" hidden>
+          <img data-img="smoke-glass" data-alt="alt.smokeGlass" alt="">
+          <img class="rv-hidden" data-img="barrel-fire" data-alt="alt.barrelFire" alt="">
+        </div>
+      </div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="rv-duo" aria-hidden="true"></div>
+      <div class="rv-dark" aria-hidden="true"></div>
+
+      <div class="corner-text corner-text--bl rv-t1">
+        <h2 class="type-mix scene-title" data-t="reveal.t1"></h2>
+      </div>
+      <div class="corner-text corner-text--bl rv-t2">
+        <h2 class="type-mix scene-title" data-t="reveal.t2"></h2>
+      </div>
+      <div class="rv-end">
+        <h2 class="scene-title rv-end-title" data-t="reveal.endTitle"></h2>
+        <p class="type-it rv-end-sub" data-t="reveal.endSub"></p>
+      </div>
+    </section>
+
+    <!-- CENA 8 — Respiro -->
+    <section class="scene scene--breath" id="s-breath" aria-hidden="true">
+      <span class="rec-dot"></span>
+    </section>
+
+    <!-- CENA 9 — O mestre -->
+    <section class="scene scene--master" id="s-master">
+      <div class="ms-media"><img data-img="master" data-alt="alt.master" alt=""></div>
+      <div class="ms-light" aria-hidden="true"></div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="ms-phrases" id="ms-phrases"></div>
+    </section>
+
+    <!-- CENA 10 — Angels' SHARE -->
+    <section class="scene scene--angels" id="s-angels" aria-label="Angels' Share">
+      <div class="scene-bg"></div>
+      <div class="an-group">
+        <p class="an-angels type-it" data-t="angels.top"></p>
+        <div class="an-card"><img data-img="smoke" data-alt="alt.smoke" alt=""></div>
+        <h2 class="an-share" data-t="angels.bottom"></h2>
+        <p class="an-micro micro" data-t="angels.micro"></p>
+      </div>
+    </section>
+
+    <!-- CENA 11 — Cobre -->
+    <section class="scene scene--copper" id="s-copper">
+      <div class="cp-media">
+        <img data-img="stills" data-alt="alt.stills" alt="">
+        <div class="tint-amber" aria-hidden="true"></div>
+      </div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="corner-text corner-text--bl cp-text">
+        <h2 class="type-mix scene-title" data-t="copper.title"></h2>
+      </div>
+    </section>
+
+    <!-- CENA 12 — Terra alta -->
+    <section class="scene scene--terra" id="s-terra">
+      <div class="tr-media"><img data-img="highlands" data-alt="alt.highlands" alt=""><div class="tint-cold" aria-hidden="true"></div></div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="tr-dark" aria-hidden="true"></div>
+      <div class="corner-text corner-text--br tr-text">
+        <h2 class="type-mix scene-title" data-t="terra.title"></h2>
+        <p class="micro tr-micro" data-t="terra.micro"></p>
+      </div>
+    </section>
+
+    <!-- CENA 13 — O ritual -->
+    <section class="scene scene--ritual" id="s-ritual">
+      <div class="scene-bg"><div class="vignette"></div></div>
+      <div class="rt-block">
+        <div class="rt-head">
+          <h2 class="rt-title" data-t="ritual.title"></h2>
+          <p class="rt-micro micro" data-t="ritual.micro"></p>
+        </div>
+        <ol class="rt-steps" id="rt-steps"></ol>
+      </div>
+    </section>
+
+    <!-- CENA 14 — Carvalho queimado -->
+    <section class="scene scene--oak" id="s-oak">
+      <div class="ok-media"><img data-img="oak" data-alt="alt.oak" alt=""></div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="ok-dark" aria-hidden="true"></div>
+      <div class="corner-text corner-text--bl ok-text">
+        <h2 class="type-mix scene-title" data-t="oak.title"></h2>
+      </div>
+    </section>
+
+    <!-- CENA 15 — Flash âmbar -->
+    <section class="scene scene--awake" id="s-awake">
+      <img class="aw-sparks" data-img="sparks" alt="" aria-hidden="true">
+      <canvas class="aw-particles" id="aw-particles" aria-hidden="true"></canvas>
+      <div class="aw-dark" aria-hidden="true"></div>
+      <h2 class="aw-title type-mix scene-title" data-t="awake.title"></h2>
+    </section>
+
+    <!-- CENA 16 — Líquido subindo -->
+    <section class="scene scene--rise" id="s-rise">
+      <div class="rs-media">
+        <canvas class="rs-canvas" id="rs-canvas" aria-hidden="true"></canvas>
+        <div class="rs-fallback" id="rs-fallback" hidden>
+          <img data-img="glass-top" data-alt="alt.glassTop" alt="">
+          <div class="rs-liquid"><svg class="rs-wave" viewBox="0 0 200 20" preserveAspectRatio="none"><path d="M0 10 Q 25 0 50 10 T 100 10 T 150 10 T 200 10 V20 H0 Z"/></svg></div>
+        </div>
+      </div>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="rs-dark" aria-hidden="true"></div>
+      <div class="rs-text">
+        <h2 class="type-mix scene-title" data-t="rise.title"></h2>
+      </div>
+    </section>
+
+    <!-- CENA 17 — Pré-final -->
+    <section class="scene scene--deep" id="s-deep">
+      <h2 class="dp-title type-mix" data-t="deep.title"></h2>
+    </section>
+
+    <!-- CENA 18 — Final + CTA -->
+    <section class="scene scene--final" id="s-final" aria-labelledby="final-title">
+      <div class="scene-bg"><div class="fn-light"></div></div>
+      <div class="fn-content">
+        <h2 class="fn-title" id="final-title" data-final-letters></h2>
+        <p class="fn-sub type-it" data-t="final.sub"></p>
+        <p class="fn-text" data-t="final.text"></p>
+        <a class="btn-min btn-cta" id="cta" href="#"><span data-t="final.cta"></span> <span class="btn-arrow" aria-hidden="true">→</span></a>
+        <a class="fn-link micro" id="cta-2" href="#" data-t="final.link"></a>
+      </div>
+      <footer class="fn-footer micro">
+        <span data-t="final.copy"></span>
+        <span data-t="final.legal"></span>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Espaçador: dá altura ao documento para o scroll existir -->
+  <div class="scroller" id="scroller" aria-hidden="true"></div>
+
+  <!-- Bibliotecas (versões fixas, servidas localmente) -->
+  <script src="vendor/gsap.min.js" defer></script>
+  <script src="vendor/ScrollTrigger.min.js" defer></script>
+  <script src="vendor/lenis.min.js" defer></script>
+
+  <!-- Configuração + orquestração (CONFIG fica no topo deste arquivo) -->
+  <script src="js/main.js" defer></script>
+
+  <!-- Núcleo -->
+  <script src="js/core/utils.js" defer></script>
+  <script src="js/core/preloader.js" defer></script>
+  <script src="js/core/hud.js" defer></script>
+  <script src="js/core/cursor.js" defer></script>
+  <script src="js/core/grain.js" defer></script>
+  <script src="js/core/sound.js" defer></script>
+
+  <!-- WebGL -->
+  <script src="js/webgl/gl.js" defer></script>
+  <script src="js/webgl/liquid-reveal.js" defer></script>
+  <script src="js/webgl/liquid-rise.js" defer></script>
+
+  <!-- Cenas (uma por arquivo) -->
+  <script src="js/scenes/s02-hero.js" defer></script>
+  <script src="js/scenes/s03-marquee.js" defer></script>
+  <script src="js/scenes/s04-manifesto.js" defer></script>
+  <script src="js/scenes/s05-gallery.js" defer></script>
+  <script src="js/scenes/s06-zoom.js" defer></script>
+  <script src="js/scenes/s07-reveal.js" defer></script>
+  <script src="js/scenes/s08-breath.js" defer></script>
+  <script src="js/scenes/s09-master.js" defer></script>
+  <script src="js/scenes/s10-angels.js" defer></script>
+  <script src="js/scenes/s11-copper.js" defer></script>
+  <script src="js/scenes/s12-terra.js" defer></script>
+  <script src="js/scenes/s13-ritual.js" defer></script>
+  <script src="js/scenes/s14-oak.js" defer></script>
+  <script src="js/scenes/s15-awake.js" defer></script>
+  <script src="js/scenes/s16-rise.js" defer></script>
+  <script src="js/scenes/s17-deep.js" defer></script>
+  <script src="js/scenes/s18-final.js" defer></script>
+</body>
+</html>

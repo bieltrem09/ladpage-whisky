@@ -24,11 +24,11 @@
 
       // a gota sobe de baixo até o centro e cresce
       tl.fromTo(card, { y: () => H.vp.h * 0.85, scale: 0.42 }, { y: 0, scale: 0.78, duration: 0.75, ease: 'power3.out' }, at + 0.3)
-        .to(card, { scale: 1, duration: 0.5, ease: 'power1.inOut' }, at + 1.05)
-        .to(title, { opacity: 0, filter: 'blur(6px)', duration: 0.3 }, at + 1.2)
-        // mergulho no bulbo: o âmbar toma a tela
-        .fromTo(img, { scale: 1 }, { scale: 22, duration: 0.65, ease: 'power3.in' }, at + 1.5)
-        .to(bg, { backgroundColor: H.config.colors.ambar, duration: 0.3 }, at + 1.8);
+        .to(card, { scale: 1, duration: 0.3, ease: 'power1.inOut' }, at + 1.05)
+        .to(title, { opacity: 0, filter: 'blur(6px)', duration: 0.25 }, at + 1.05)
+        // mergulho no bulbo: o âmbar toma a tela antes da cena 7 entrar
+        .fromTo(img, { scale: 1 }, { scale: 24, duration: 0.55, ease: 'power2.in' }, at + 1.2)
+        .to(bg, { backgroundColor: H.config.colors.ambar, duration: 0.25 }, at + 1.5);
     },
   });
 })(window.HALVORN);

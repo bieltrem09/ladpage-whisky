@@ -377,7 +377,7 @@ html.has-cursor .cursor.is-on { opacity: 1; }
 }
 .scene .om-glass img {
   position: absolute; left: 50%; top: 50%;
-  width: auto; height: 23vw;
+  width: auto; height: 42vw;
   transform: translate(-50%, -50%);
   object-fit: contain;
 }
@@ -669,7 +669,14 @@ html.has-cursor .cursor.is-on { opacity: 1; }
 }
 .fl-rec-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ambar); animation: rec 1.1s steps(1) infinite; }
 .fl-caps { position: absolute; z-index: 4; left: var(--gutter); right: var(--gutter); bottom: calc(11vh + 4vh); }
-.fl-cap { position: absolute; left: 0; bottom: 0; font-size: clamp(1.8rem, 4.4vw, 4.6rem); visibility: hidden; }
+.fl-cap { position: absolute; left: 0; bottom: 0; font-size: clamp(1.8rem, 4.4vw, 4.6rem); visibility: hidden; text-shadow: 0 2px 28px rgba(0, 0, 0, 0.65); }
+.fl-cap em { color: var(--ambar-quente); text-shadow: 0 0 2px rgba(0, 0, 0, 0.5), 0 2px 24px rgba(0, 0, 0, 0.9); }
+/* gradiente escuro atrás das legendas (legíveis sobre quadros claros) */
+.scene--film::after {
+  content: ''; position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 45%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  pointer-events: none;
+}
 
 /* ------------------------------------------------------- CENA 18: pré-final */
 .scene--deep { background: var(--carvao); z-index: 6; }
@@ -763,7 +770,7 @@ html.has-cursor .cursor.is-on { opacity: 1; }
   .fn-text { margin-top: 1.4rem; }
 
   .hero-type--front .hero-title { -webkit-mask-image: none; mask-image: none; }
-  .scene .om-glass img { height: 46vw; }
+  .scene .om-glass img { height: 84vw; }
   .scene .z-img { width: 100vw; height: auto; }
   .fl-rec { top: calc(11vh + 40px); }
   .g-ph { width: 44vw !important; }

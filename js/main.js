@@ -32,27 +32,41 @@ const CONFIG = {
   },
 
   /* ------------------------------------------------------------- imagens */
-  imageBase: 'img/',
+  /* Versões otimizadas (upscale 4x com IA, depois reduzidas e salvas em WebP):
+     img/hd/ (2560px) para telas grandes e img/md/ (1280px) para celular.
+     Os originais continuam em img/. Os "-cut" são recortes sem o fundo branco.
+     Para trocar uma imagem: gere as duas versões com o mesmo nome. */
+  imageDirs: { hd: 'img/hd/', md: 'img/md/' },
   images: {
-    hero: 'watermarked_img_656600401022554758.jpg',          // decanter sobre barril
-    cellar: '1ae79c50-6f75-42c1-811d-05ce9d26e1d5.jpeg',      // túnel de barris
-    glass: '0f40071d-f5a1-4819-91c5-88a8e419817b.jpeg',       // copo vazio, fundo branco
-    field: '9907422c-1227-419f-8cd7-1a02046034c8.jpeg',       // campo de cevada
-    hand: 'watermarked_img_522449455733637753.jpg',           // mão com grãos
-    grains: 'watermarked_img_7964294306485183090.jpg',        // grãos no branco
-    cork: 'watermarked_img_6295541903596384342.jpg',          // rolha
-    label: '5ef56255-3117-448c-83ab-a90cf5ee3268.jpeg',       // rótulo dourado
-    copper: '41016df2-c10e-47b5-958d-878915ff845c.jpeg',      // alambique (detalhe)
-    drop: 'acc67d1b-8ad3-4452-88f5-e19522d196a8.jpeg',        // gota
-    'smoke-glass': '1afe814a-22a9-4796-a5ed-f1e2c191813f.jpeg', // copo com fumaça
-    'barrel-fire': 'watermarked_img_18115323764787887869.jpg',  // barril em chamas
-    master: 'watermarked_img_10388615411631255886.jpg',       // mestre destilador
-    smoke: '55665b79-6874-43e5-b583-e352a94ef7e1.jpeg',       // fumaça âmbar
-    stills: 'watermarked_img_16881551295261496567.jpg',       // destilaria
-    highlands: 'watermarked_img_11618902999954946388.jpg',    // rio e montanhas
-    oak: 'watermarked_img_12252475341680234219.jpg',          // madeira queimada
-    sparks: '3b897243-3b90-47db-9c7b-bfae78a0cae2.jpeg',      // faíscas
-    'glass-top': 'watermarked_img_9097782007578566460.jpg',   // copo visto de cima
+    hero: 'hero.webp',                 // decanter sobre barril
+    cellar: 'cellar.webp',             // túnel de barris
+    'glass-cut': 'glass-cut.webp',     // copo de cristal (recortado, para fundo escuro)
+    field: 'field.webp',               // campo de cevada
+    hand: 'hand.webp',                 // mão com grãos
+    'grains-cut': 'grains-cut.webp',   // grãos (recortados)
+    'cork-cut': 'cork-cut.webp',       // rolha (recortada)
+    'label-cut': 'label-cut.webp',     // rótulo: só o dourado
+    copper: 'copper.webp',             // alambique (detalhe)
+    'drop-cut': 'drop-cut.webp',       // gota (recortada)
+    'smoke-glass': 'smoke-glass.webp', // copo com fumaça
+    'barrel-fire': 'barrel-fire.webp', // barril em chamas
+    master: 'master.webp',             // mestre destilador
+    smoke: 'smoke.webp',               // fumaça âmbar
+    stills: 'stills.webp',             // destilaria
+    highlands: 'highlands.webp',       // rio e montanhas
+    oak: 'oak.webp',                   // madeira queimada
+    sparks: 'sparks.webp',             // faíscas
+    'glass-top': 'glass-top.webp',     // copo visto de cima
+  },
+
+  /* Cena 17 — "O filme": sequência de quadros controlada pelo scroll.
+     Paisagem (desktop) e retrato (celular), gerados a partir das imagens HD.
+     O mesmo filme em MP4 fica em video/halvorn-filme.mp4. */
+  film: {
+    frames: 168,
+    landscape: 'img/film/l/f{n}.webp',
+    portrait: 'img/film/p/f{n}.webp',
+    fps: 24,
   },
 
   /* --------------------------------------------------------------- scroll */
@@ -128,6 +142,12 @@ const CONFIG = {
 
     'rise.title': 'ESTA NOITE\n*merece*.',
 
+    filmCaptions: [
+      'UM FILME DE *dezoito* ANOS.',
+      'FOGO, *cobre* E CARVALHO.',
+      'TUDO NUM SÓ *gole*.',
+    ],
+
     'deep.title': 'ELE AINDA ESTÁ AÍ. *No fundo do copo.*',
 
     'final.title': 'HALVORN',
@@ -141,8 +161,8 @@ const CONFIG = {
     /* textos alternativos das imagens */
     'alt.hero': 'Decanter de cristal com whisky âmbar sobre um barril, atravessado por um feixe de luz',
     'alt.cellar': 'Túnel de adega com fileiras de barris de carvalho e raios de luz',
-    'alt.glass': 'Copo de cristal lapidado vazio sobre fundo branco',
-    'alt.drop': 'Uma gota de whisky âmbar caindo sobre fundo branco',
+    'alt.glass': 'Copo de cristal lapidado vazio, iluminado no escuro',
+    'alt.drop': 'Uma gota de whisky âmbar caindo',
     'alt.smokeGlass': 'Copo de whisky com esfera de gelo envolto em fumaça',
     'alt.barrelFire': 'Interior de um barril de carvalho em chamas durante a tostagem',
     'alt.master': 'Retrato em preto e branco de um mestre destilador idoso segurando um copo',
@@ -154,13 +174,14 @@ const CONFIG = {
   },
 
   /* Galeria da cena 5 — posição (left em %), largura (vw), proporção (w/h),
-     velocidade de parallax (data-speed) e atraso de entrada (em telas). */
+     velocidade de parallax (data-speed) e atraso de entrada (em telas).
+     cut: true = imagem recortada (sem fundo), mostrada inteira e flutuando. */
   gallery: [
     { img: 'field',  caption: '01 — Cevada',   alt: 'Campo de cevada sob céu de tempestade',            left: 50, top: 0,  w: 27, ratio: 1.55, speed: 1.0,  delay: 0.0 },
     { img: 'hand',   caption: '02 — Colheita', alt: 'Mão segurando grãos de cevada sobre madeira escura', left: 79, top: 0,  w: 16, ratio: 1.2,  speed: 1.45, delay: 0.25 },
-    { img: 'grains', caption: '03 — Maltagem', alt: 'Grãos de cevada maltada sobre fundo branco',        left: 33, top: 0,  w: 14, ratio: 1.15, speed: 0.8,  delay: 0.55 },
-    { img: 'cork',   caption: '04 — Rolha',    alt: 'Rolha de cortiça sobre fundo branco',               left: 66, top: 0,  w: 12, ratio: 1.0,  speed: 1.6,  delay: 0.95 },
-    { img: 'label',  caption: '05 — Rótulo',   alt: 'Rótulo com hot stamping dourado em macro',          left: 7,  top: 0,  w: 18, ratio: 1.3,  speed: 1.1,  delay: 1.15 },
+    { img: 'grains-cut', cut: true, caption: '03 — Maltagem', alt: 'Grãos de cevada maltada',          left: 31, top: 0,  w: 20, ratio: 1.49, speed: 0.8,  delay: 0.55 },
+    { img: 'cork-cut',   cut: true, caption: '04 — Rolha',    alt: 'Rolha de cortiça',                 left: 63, top: 0,  w: 17, ratio: 1.49, speed: 1.6,  delay: 0.95 },
+    { img: 'label-cut',  cut: true, caption: '05 — Rótulo',   alt: 'Ornamento do rótulo em hot stamping dourado', left: 4, top: 0, w: 24, ratio: 1.49, speed: 1.1,  delay: 1.15 },
     { img: 'copper', caption: '06 — Cobre',    alt: 'Detalhe de alambique de cobre com rebites',         left: 45, top: 0,  w: 20, ratio: 1.5,  speed: 0.95, delay: 1.4 },
   ],
 
@@ -181,11 +202,12 @@ const CONFIG = {
     14: ['CAPÍTULO 14 — A MADEIRA', 'Carvalho tostado ao fogo vivo'],
     15: ['CAPÍTULO 15 — O DESPERTAR', 'A primeira faísca'],
     16: ['CAPÍTULO 16 — A NOITE', 'Sirva puro, ou com uma gota de água'],
-    17: ['CAPÍTULO 17 — O FUNDO', 'O que fica depois do último gole'],
-    18: ['CAPÍTULO 18 — HALVORN', 'Single Malt · 18 Anos'],
+    17: ['CAPÍTULO 17 — O FILME', 'Dezoito anos em alguns segundos'],
+    18: ['CAPÍTULO 18 — O FUNDO', 'O que fica depois do último gole'],
+    19: ['CAPÍTULO 19 — HALVORN', 'Single Malt · 18 Anos'],
   },
 
-  totalChapters: 18,
+  totalChapters: 19,
 
   /* Links do CTA */
   cta: {
@@ -216,7 +238,10 @@ window.HALVORN = (function () {
   H.scene = (def) => H.scenes.push(def);
 
   /** Caminho completo de uma imagem pela chave do CONFIG. */
-  H.img = (key) => CONFIG.imageBase + CONFIG.images[key];
+  /** HD em telas grandes (considerando o devicePixelRatio), MD no resto */
+  H.imgDir = () =>
+    window.innerWidth * Math.min(window.devicePixelRatio || 1, 2) > 1400 ? CONFIG.imageDirs.hd : CONFIG.imageDirs.md;
+  H.img = (key) => H.imgDir() + CONFIG.images[key];
 
   document.addEventListener('DOMContentLoaded', () => boot(H));
   return H;

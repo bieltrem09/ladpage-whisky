@@ -1,11 +1,11 @@
 /* =============================================================================
-   CENA 17 — Pré-final: "ELE AINDA ESTÁ AÍ. No fundo do copo."
+   CENA 18 — Pré-final: "ELE AINDA ESTÁ AÍ. No fundo do copo."
    Fundo preto, frase única no centro, entra palavra por palavra e fica
    ~1 tela de scroll parada.
    ============================================================================= */
 (function (H) {
   H.scene({
-    n: 17,
+    n: 18,
     el: '#s-deep',
     len: 1.8,
     overlap: 0,

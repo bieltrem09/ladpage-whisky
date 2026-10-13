@@ -20,7 +20,7 @@
       const wrap = ctx.q('#g-photos');
       wrap.innerHTML = H.config.gallery
         .map((p, i) => `
-          <figure class="g-ph" data-i="${i}" data-speed="${p.speed}" data-cursor="olhe"
+          <figure class="g-ph${p.cut ? ' g-ph--cut' : ''}" data-i="${i}" data-speed="${p.speed}" data-cursor="olhe"
             style="left:${p.left}%;width:${p.w}vw">
             <div class="g-ph-in" style="aspect-ratio:${p.ratio}">
               <img src="${H.img(p.img)}" alt="${p.alt}" decoding="async">

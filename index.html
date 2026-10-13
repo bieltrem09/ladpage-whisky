@@ -129,7 +129,7 @@
           <div class="om-inner">
             <img class="om-img om-hero" data-img="hero" data-alt="alt.hero" alt="">
             <img class="om-img om-cellar" data-img="cellar" data-alt="alt.cellar" alt="">
-            <img class="om-img om-glass" data-img="glass" data-alt="alt.glass" alt="">
+            <div class="om-glass"><img data-img="glass-cut" data-alt="alt.glass" alt=""></div>
             <div class="om-flash" aria-hidden="true"></div>
           </div>
         </div>
@@ -169,7 +169,7 @@
       <div class="scene-bg"></div>
       <h2 class="z-title type-mix" data-t="zoom.title"></h2>
       <div class="z-card">
-        <img class="z-img" data-img="drop" data-alt="alt.drop" alt="">
+        <img class="z-img" data-img="drop-cut" data-alt="alt.drop" alt="">
       </div>
     </section>
 
@@ -291,12 +291,22 @@
       </div>
     </section>
 
-    <!-- CENA 17 — Pré-final -->
+    <!-- CENA 17 — O filme (sequência de quadros controlada pelo scroll) -->
+    <section class="scene scene--film" id="s-film" aria-label="O filme: montagem com as imagens da Halvorn">
+      <canvas class="fl-canvas" id="fl-canvas" aria-hidden="true"></canvas>
+      <div class="vignette" aria-hidden="true"></div>
+      <div class="fl-bar fl-bar--top" aria-hidden="true"></div>
+      <div class="fl-bar fl-bar--bottom" aria-hidden="true"></div>
+      <div class="fl-rec micro" aria-hidden="true"><span class="fl-rec-dot"></span> REC <span id="fl-tc">00:00:00:00</span></div>
+      <div class="fl-caps" id="fl-caps"></div>
+    </section>
+
+    <!-- CENA 18 — Pré-final -->
     <section class="scene scene--deep" id="s-deep">
       <h2 class="dp-title type-mix" data-t="deep.title"></h2>
     </section>
 
-    <!-- CENA 18 — Final + CTA -->
+    <!-- CENA 19 — Final + CTA -->
     <section class="scene scene--final" id="s-final" aria-labelledby="final-title">
       <div class="scene-bg"><div class="fn-light"></div></div>
       <div class="fn-content">
@@ -353,7 +363,8 @@
   <script src="js/scenes/s14-oak.js" defer></script>
   <script src="js/scenes/s15-awake.js" defer></script>
   <script src="js/scenes/s16-rise.js" defer></script>
-  <script src="js/scenes/s17-deep.js" defer></script>
-  <script src="js/scenes/s18-final.js" defer></script>
+  <script src="js/scenes/s17-film.js" defer></script>
+  <script src="js/scenes/s18-deep.js" defer></script>
+  <script src="js/scenes/s19-final.js" defer></script>
 </body>
 </html>

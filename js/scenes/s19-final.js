@@ -1,12 +1,12 @@
 /* =============================================================================
-   CENA 18 — Final: assinatura da marca + CTA
+   CENA 19 — Final: assinatura da marca + CTA
    - "HALVORN" surge com o mesmo efeito de letras subindo do hero (amarrando o
      começo ao fim); depois "Single Malt · 18 Anos", o parágrafo, o CTA e o
      rodapé em fade sequencial.
    ============================================================================= */
 (function (H) {
   H.scene({
-    n: 18,
+    n: 19,
     el: '#s-final',
     len: 1.6,
     overlap: 0.2,

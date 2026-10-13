@@ -370,6 +370,17 @@ html.has-cursor .cursor.is-on { opacity: 1; }
 .om-img { position: absolute; inset: 0; }
 .om-hero { object-position: 58% 50%; }
 .om-cellar, .om-glass { opacity: 0; }
+/* o copo recortado flutua no centro do card, sobre um brilho âmbar */
+.om-glass {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 22vw 16vw at 50% 52%, rgba(200, 118, 30, 0.38), rgba(26, 23, 20, 0.95) 70%), var(--fumaca);
+}
+.scene .om-glass img {
+  position: absolute; left: 50%; top: 50%;
+  width: auto; height: 23vw;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+}
 .om-flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
 
 .cut-line { position: absolute; inset: 0; z-index: 5; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
@@ -427,6 +438,9 @@ html.has-cursor .cursor.is-on { opacity: 1; }
 .g-ph { position: absolute; top: 0; margin: 0; will-change: transform; }
 .g-ph-in { position: relative; overflow: hidden; clip-path: inset(100% 0 0 0); transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .g-ph-in img { position: absolute; inset: 0; }
+/* recortes sem fundo: a imagem inteira, flutuando, com sombra suave */
+.g-ph--cut .g-ph-in { overflow: visible; }
+.g-ph--cut .g-ph-in img { object-fit: contain; filter: drop-shadow(0 18px 24px rgba(60, 40, 20, 0.12)); }
 .g-ph figcaption { margin-top: 10px; opacity: 0; transform: translateY(-4px); transition: opacity 0.5s, transform 0.5s; }
 .g-ph:hover .g-ph-in { transform: scale(1.03); }
 .g-ph:hover figcaption { opacity: 1; transform: none; }
@@ -448,8 +462,9 @@ html.has-cursor .cursor.is-on { opacity: 1; }
   font-size: clamp(1.6rem, 3.3vw, 3.6rem);
   color: var(--carvao);
 }
-.z-card { position: absolute; inset: 0; z-index: 2; clip-path: inset(50% 50% 50% 50%); will-change: clip-path, transform; }
-.z-img { position: absolute; inset: 0; transform-origin: 50% 60%; }
+.z-card { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; will-change: transform; }
+/* transform-origin = centro do bulbo da gota (o zoom mergulha nele) */
+.scene .z-img { position: relative; width: auto; height: 78vh; max-width: 100vw; object-fit: contain; transform-origin: var(--bulb-x, 50%) var(--bulb-y, 60%); will-change: transform; }
 
 /* ------------------------------------------------------- CENA 7: revelação */
 .scene--reveal { background: var(--carvao); }
@@ -639,8 +654,25 @@ html.has-cursor .cursor.is-on { opacity: 1; }
 .rs-text em { color: var(--ambar-quente); }
 .rs-text br + em { font-size: 0.75em; }
 
-/* ------------------------------------------------------- CENA 17: pré-final */
-.scene--deep { background: var(--carvao); z-index: 5; }
+/* ------------------------------------------------------- CENA 17: o filme */
+.scene--film { background: #000; z-index: 5; }
+.fl-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* barras de cinema (letterbox) que abrem e fecham a cena */
+.fl-bar { position: absolute; left: 0; right: 0; z-index: 3; height: 50%; background: #000; }
+.fl-bar--top { top: 0; transform-origin: top; }
+.fl-bar--bottom { bottom: 0; transform-origin: bottom; }
+.fl-rec {
+  position: absolute; z-index: 4; left: var(--gutter); top: calc(11vh + 14px);
+  display: flex; align-items: center; gap: 8px;
+  color: rgba(242, 237, 228, 0.75); font-variant-numeric: tabular-nums;
+  opacity: 0;
+}
+.fl-rec-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ambar); animation: rec 1.1s steps(1) infinite; }
+.fl-caps { position: absolute; z-index: 4; left: var(--gutter); right: var(--gutter); bottom: calc(11vh + 4vh); }
+.fl-cap { position: absolute; left: 0; bottom: 0; font-size: clamp(1.8rem, 4.4vw, 4.6rem); visibility: hidden; }
+
+/* ------------------------------------------------------- CENA 18: pré-final */
+.scene--deep { background: var(--carvao); z-index: 6; }
 .dp-title {
   position: absolute; left: 50%; top: 50%;
   width: min(86vw, 1100px);
@@ -649,8 +681,8 @@ html.has-cursor .cursor.is-on { opacity: 1; }
   font-size: clamp(1.5rem, 2.8vw, 3rem);
 }
 
-/* ------------------------------------------------------- CENA 18: final */
-.scene--final { z-index: 6; }
+/* ------------------------------------------------------- CENA 19: final */
+.scene--final { z-index: 7; }
 .scene--final .scene-bg { background: var(--fumaca); }
 .fn-light {
   position: absolute; left: 50%; top: 46%;
@@ -731,6 +763,9 @@ html.has-cursor .cursor.is-on { opacity: 1; }
   .fn-text { margin-top: 1.4rem; }
 
   .hero-type--front .hero-title { -webkit-mask-image: none; mask-image: none; }
+  .scene .om-glass img { height: 46vw; }
+  .scene .z-img { width: 100vw; height: auto; }
+  .fl-rec { top: calc(11vh + 40px); }
   .g-ph { width: 44vw !important; }
   .g-ph[data-i="0"] { left: 50% !important; }
   .g-ph[data-i="1"] { left: 6% !important; }

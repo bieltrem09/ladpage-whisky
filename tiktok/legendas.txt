@@ -1,0 +1,23 @@
+LEGENDA (V1)
+Fiz um site que parece comercial de TV 🍸 Landing page com animação de scroll, ingredientes que se separam e passaporte com carimbo. Quanto você cobraria por esse site? 👇
+
+#webdesign #landingpage #sitebonito #designdesite #uxui #frontend #margarita #designer
+
+Beba com moderação. +18
+
+COMENTÁRIO FIXADO
+Qual seção ficou mais insana? 🍹
+
+ROTEIRO DA EDIÇÃO (27 s, 120 BPM, cortes nas batidas)
+00,0–01,0  Loader do site (selo + contador)          "fiz um site..."
+01,0–02,5  DROP: hero mobile, letras sobem           "...que parece comercial de TV"
+02,5–04,0  Hero desktop em mockup de navegador       "isso é só a primeira tela"
+04,0–05,5  Whip: rolagem até "A história"
+05,5–10,0  Anatomia: drink junta e desmonta (pop por ingrediente)   "role a tela e o drink se desmonta"
+10,0–11,0  Anatomia desktop com legendas
+11,0–14,5  Receitas: copo troca a cada aba + modal picante          "cada receita tem sua animação"
+14,5–19,0  Passaporte: 3 carimbos, um por batida (thump + tremor)   "e tem passaporte de verdade"
+19,0–20,5  Mapa de bares                              "com todos os bares no mapa"
+20,5–23,5  Celular: time-lapse do site (build-up)     "e funciona perfeito no celular"
+23,5–26,5  Rodapé MARGARITA                           "quanto você cobraria por esse site?" + "Beba com moderação · +18"
+26,5–27,0  Volta ao loader: o último frame emenda no primeiro (loop)

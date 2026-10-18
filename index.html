@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Raw Boost — Acima das nuvens</title>
+  <meta name="description" content="Animação de rolagem quadro a quadro em canvas.">
+  <meta name="theme-color" content="#0b1a2b">
+
+  <!-- Primeiro quadro carregado com prioridade: aparece antes do JS terminar -->
+  <link rel="preload" as="image" href="frames/frame-0001.jpg" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <a class="brand" href="#">RAW BOOST</a>
+    <nav aria-label="Principal">
+      <a href="#sobre">Sobre</a>
+    </nav>
+  </header>
+
+  <main>
+    <!--
+      Seção da animação. A altura (definida pelo JS via --scroll-length)
+      é o "trilho" de rolagem; o .scrolly__sticky fica preso na tela
+      enquanto o usuário percorre esse trilho.
+    -->
+    <section class="scrolly" id="scrolly" aria-label="Animação da lata flutuando acima das nuvens">
+      <div class="scrolly__sticky">
+        <canvas class="scrolly__canvas" id="scrolly-canvas" role="img"
+                aria-label="Lata de bebida girando e flutuando acima das nuvens"></canvas>
+
+        <!-- Fallback sem JavaScript -->
+        <noscript>
+          <img class="scrolly__fallback" src="frames/frame-0001.jpg"
+               alt="Lata de bebida flutuando acima das nuvens">
+        </noscript>
+
+        <div class="scrolly__overlay">
+          <p class="caption" data-start="0" data-end="0.22">
+            <span class="caption__eyebrow">Raw Boost Light</span>
+            <span class="caption__title">Leve como<br>uma nuvem.</span>
+          </p>
+          <p class="caption" data-start="0.32" data-end="0.58">
+            <span class="caption__eyebrow">Energia limpa</span>
+            <span class="caption__title">Zero açúcar.<br>Todo o gás.</span>
+          </p>
+          <p class="caption" data-start="0.68" data-end="1">
+            <span class="caption__eyebrow">100% natural</span>
+            <span class="caption__title">Eleve o<br>seu dia.</span>
+          </p>
+        </div>
+
+        <div class="scroll-hint" aria-hidden="true">
+          <span>Role</span>
+          <span class="scroll-hint__line"></span>
+        </div>
+
+        <div class="loader" id="loader" role="status" aria-live="polite">
+          <div class="loader__bar"><span id="loader-fill"></span></div>
+          <span class="loader__label" id="loader-label">Carregando 0%</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="content" id="sobre">
+      <div class="content__inner">
+        <h2>Feita para quem vive nas alturas.</h2>
+        <p>
+          Esta é a seção que aparece depois da animação. A partir daqui a página
+          rola normalmente — substitua este texto pelo conteúdo do seu site.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Raw Boost</p>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

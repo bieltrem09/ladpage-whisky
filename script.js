@@ -1,87 +1,34 @@
 /* =========================================================
-   Animação de rolagem quadro a quadro (canvas)
+   Animações de rolagem quadro a quadro (canvas)
+
+   Cada <section class="scrolly"> da página vira uma animação
+   independente, configurada por atributos data-*:
+
+     data-frame-path   caminho com {n} no lugar do número do quadro
+                       (ex.: "frames/frame-{n}.jpg" → frame-0001.jpg)
+     data-frame-count  total de quadros
+     data-reduced-frame  quadro exibido com prefers-reduced-motion
    ========================================================= */
 (() => {
   'use strict';
 
-  // ---------- Configuração ----------
+  // ---------- Configuração geral ----------
   const CONFIG = {
-    frameCount: 240,
-    // Caminho relativo ao index.html. Gera frames/frame-0001.jpg ... frame-0240.jpg
-    framePath: (i) => `frames/frame-${String(i).padStart(4, '0')}.jpg`,
-    // Pixels de rolagem por quadro. 240 quadros x 14px ≈ 3360px de trilho.
+    // Pixels de rolagem por quadro. 300 quadros x 14px ≈ 4200px de trilho.
     pxPerFrame: 14,
     // Suavização (0–1). Menor = mais "macio", maior = mais responsivo.
     ease: 0.14,
     // Limite de densidade de pixels do canvas (economiza memória/GPU no celular).
     maxDpr: 2,
-    // Quantas imagens baixar ao mesmo tempo.
+    // Quantas imagens baixar ao mesmo tempo, por animação.
     concurrency: 6,
-    // Quadro mostrado quando o usuário prefere movimento reduzido.
-    reducedMotionFrame: 120,
+    // Começa a baixar uma animação quando ela está a esta distância da tela.
+    preloadMargin: '150% 0px',
   };
 
   const root = document.documentElement;
-  const section = document.getElementById('scrolly');
-  const canvas = document.getElementById('scrolly-canvas');
-  if (!section || !canvas) return;
-
-  const loader = document.getElementById('loader');
-  const loaderFill = document.getElementById('loader-fill');
-  const loaderLabel = document.getElementById('loader-label');
-  const captions = Array.from(section.querySelectorAll('.caption'));
-
-  const ctx = canvas.getContext('2d', { alpha: false });
   const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  const images = new Array(CONFIG.frameCount);   // HTMLImageElement | undefined
-  const loaded = new Uint8Array(CONFIG.frameCount); // 1 quando pronto para desenhar
-  let loadedCount = 0;
-  let preloadStarted = false;
-
   let reduced = motionQuery.matches;
-  let targetFrame = 0;   // para onde a rolagem aponta
-  let currentFrame = 0;  // valor suavizado (float)
-  let drawnFrame = -1;   // último quadro desenhado
-  let rafId = 0;
-  let canvasW = 0;
-  let canvasH = 0;
-
-  // ---------- Carregamento ----------
-  function loadFrame(index) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.decoding = 'async';
-      img.src = CONFIG.framePath(index + 1);
-
-      const done = () => {
-        images[index] = img;
-        loaded[index] = 1;
-        loadedCount++;
-        updateLoader();
-        // Se este é o quadro que deveria estar na tela, redesenha.
-        if (Math.round(currentFrame) === index || drawnFrame === -1) {
-          drawnFrame = -2;
-          requestTick();
-        }
-        resolve();
-      };
-
-      const fail = () => {
-        console.warn(`[scrolly] Não foi possível carregar ${img.src}`);
-        loadedCount++;
-        updateLoader();
-        resolve();
-      };
-
-      img.onload = () => {
-        // decode() evita travadas no primeiro desenho do quadro
-        if (img.decode) img.decode().then(done, done);
-        else done();
-      };
-      img.onerror = fail;
-    });
-  }
 
   // Ordem de carregamento: primeiro, último e meio, depois preenche
   // as lacunas progressivamente. Assim qualquer posição da rolagem tem
@@ -99,183 +46,277 @@
     return order;
   }
 
-  async function preloadAll() {
-    if (preloadStarted) return;
-    preloadStarted = true;
+  class ScrollSequence {
+    constructor(section) {
+      this.section = section;
+      this.canvas = section.querySelector('.scrolly__canvas');
+      this.ctx = this.canvas.getContext('2d', { alpha: false });
+      this.loader = section.querySelector('.loader');
+      this.loaderFill = section.querySelector('.loader__bar span');
+      this.loaderLabel = section.querySelector('.loader__label');
+      this.captions = Array.from(section.querySelectorAll('.caption'));
 
-    const queue = loadOrder(CONFIG.frameCount);
-    // O primeiro quadro sozinho, para a tela aparecer o quanto antes.
-    await loadFrame(queue.shift());
+      this.pathTemplate = section.dataset.framePath;
+      this.frameCount = parseInt(section.dataset.frameCount, 10);
+      this.reducedFrame = Math.min(
+        this.frameCount,
+        Math.max(1, parseInt(section.dataset.reducedFrame, 10) || Math.ceil(this.frameCount / 2))
+      ) - 1;
 
-    const worker = async () => {
-      while (queue.length) await loadFrame(queue.shift());
-    };
-    await Promise.all(Array.from({ length: CONFIG.concurrency }, worker));
-  }
+      this.images = new Array(this.frameCount);
+      this.loaded = new Uint8Array(this.frameCount);
+      this.loadedCount = 0;
+      this.preloadStarted = false;
 
-  function updateLoader() {
-    const total = reduced ? 1 : CONFIG.frameCount;
-    const pct = Math.min(100, Math.round((loadedCount / total) * 100));
-    loaderFill.style.transform = `scaleX(${pct / 100})`;
-    loaderLabel.textContent = `Carregando ${pct}%`;
-    if (pct >= 100) loader.classList.add('is-done');
-  }
+      this.targetFrame = 0;   // para onde a rolagem aponta
+      this.currentFrame = 0;  // valor suavizado (float)
+      this.drawnFrame = -1;   // último quadro desenhado
+      this.rafId = 0;
+      this.canvasW = 0;
+      this.canvasH = 0;
 
-  // Se o quadro pedido ainda não chegou, usa o mais próximo já carregado.
-  function nearestLoaded(index) {
-    if (loaded[index]) return index;
-    for (let d = 1; d < CONFIG.frameCount; d++) {
-      if (loaded[index - d]) return index - d;
-      if (loaded[index + d]) return index + d;
-    }
-    return -1;
-  }
-
-  // ---------- Canvas ----------
-  function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, CONFIG.maxDpr);
-    const rect = canvas.getBoundingClientRect();
-    const w = Math.max(1, Math.round(rect.width * dpr));
-    const h = Math.max(1, Math.round(rect.height * dpr));
-    if (w === canvasW && h === canvasH) return;
-    canvasW = canvas.width = w;
-    canvasH = canvas.height = h;
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    drawnFrame = -2; // força redesenho
-    render(true);
-  }
-
-  // Desenha a imagem cobrindo todo o canvas sem distorcer (equivalente a object-fit: cover).
-  function drawCover(img) {
-    const iw = img.naturalWidth;
-    const ih = img.naturalHeight;
-    const scale = Math.max(canvasW / iw, canvasH / ih);
-    const dw = iw * scale;
-    const dh = ih * scale;
-    const dx = (canvasW - dw) / 2;
-    const dy = (canvasH - dh) / 2;
-    ctx.drawImage(img, dx, dy, dw, dh);
-  }
-
-  function render(force = false) {
-    const wanted = Math.round(currentFrame);
-    const index = nearestLoaded(wanted);
-    if (index === -1) return;
-    if (!force && index === drawnFrame) return;
-    drawCover(images[index]);
-    drawnFrame = index;
-  }
-
-  // ---------- Rolagem ----------
-  function scrollProgress() {
-    const rect = section.getBoundingClientRect();
-    const scrollable = section.offsetHeight - window.innerHeight;
-    if (scrollable <= 0) return 0;
-    return Math.min(1, Math.max(0, -rect.top / scrollable));
-  }
-
-  function updateCaptions(progress) {
-    for (const el of captions) {
-      const start = parseFloat(el.dataset.start);
-      const end = parseFloat(el.dataset.end);
-      el.classList.toggle('is-active', progress >= start && progress <= end);
-    }
-  }
-
-  function onScroll() {
-    if (reduced) return;
-    const progress = scrollProgress();
-    targetFrame = progress * (CONFIG.frameCount - 1);
-    updateCaptions(progress);
-    root.classList.toggle('is-scrolled', progress > 0.01);
-    requestTick();
-  }
-
-  function tick() {
-    rafId = 0;
-    const diff = targetFrame - currentFrame;
-
-    if (Math.abs(diff) < 0.05) {
-      currentFrame = targetFrame;
-    } else {
-      currentFrame += diff * CONFIG.ease;
+      this.tick = this.tick.bind(this);
     }
 
-    render();
+    framePath(index) {
+      return this.pathTemplate.replace('{n}', String(index + 1).padStart(4, '0'));
+    }
 
-    // Continua animando até alcançar o alvo; depois para (sem rAF ocioso).
-    if (currentFrame !== targetFrame) requestTick();
+    // ---------- Carregamento ----------
+    loadFrame(index) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = this.framePath(index);
+
+        const done = () => {
+          this.images[index] = img;
+          this.loaded[index] = 1;
+          this.loadedCount++;
+          this.updateLoader();
+          // Se este é o quadro que deveria estar na tela, redesenha.
+          if (Math.round(this.currentFrame) === index || this.drawnFrame === -1) {
+            this.drawnFrame = -2;
+            this.requestTick();
+          }
+          resolve();
+        };
+
+        const fail = () => {
+          console.warn(`[scrolly] Não foi possível carregar ${img.src}`);
+          this.loadedCount++;
+          this.updateLoader();
+          resolve();
+        };
+
+        img.onload = () => {
+          // decode() evita travadas no primeiro desenho do quadro
+          if (img.decode) img.decode().then(done, done);
+          else done();
+        };
+        img.onerror = fail;
+      });
+    }
+
+    async preloadAll() {
+      if (this.preloadStarted) return;
+      this.preloadStarted = true;
+
+      const queue = loadOrder(this.frameCount);
+      // O primeiro quadro sozinho, para a tela aparecer o quanto antes.
+      await this.loadFrame(queue.shift());
+
+      const worker = async () => {
+        while (queue.length) await this.loadFrame(queue.shift());
+      };
+      await Promise.all(Array.from({ length: CONFIG.concurrency }, worker));
+    }
+
+    updateLoader() {
+      if (!this.loader) return;
+      const total = reduced ? 1 : this.frameCount;
+      const pct = Math.min(100, Math.round((this.loadedCount / total) * 100));
+      this.loaderFill.style.transform = `scaleX(${pct / 100})`;
+      this.loaderLabel.textContent = `Carregando ${pct}%`;
+      if (pct >= 100) this.loader.classList.add('is-done');
+    }
+
+    // Se o quadro pedido ainda não chegou, usa o mais próximo já carregado.
+    nearestLoaded(index) {
+      if (this.loaded[index]) return index;
+      for (let d = 1; d < this.frameCount; d++) {
+        if (this.loaded[index - d]) return index - d;
+        if (this.loaded[index + d]) return index + d;
+      }
+      return -1;
+    }
+
+    // ---------- Canvas ----------
+    resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, CONFIG.maxDpr);
+      const rect = this.canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width * dpr));
+      const h = Math.max(1, Math.round(rect.height * dpr));
+      if (w === this.canvasW && h === this.canvasH) return;
+      this.canvasW = this.canvas.width = w;
+      this.canvasH = this.canvas.height = h;
+      this.ctx.imageSmoothingEnabled = true;
+      this.ctx.imageSmoothingQuality = 'high';
+      this.render(true);
+    }
+
+    // Desenha a imagem cobrindo todo o canvas sem distorcer (equivalente a object-fit: cover).
+    drawCover(img) {
+      const iw = img.naturalWidth;
+      const ih = img.naturalHeight;
+      const scale = Math.max(this.canvasW / iw, this.canvasH / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      this.ctx.drawImage(img, (this.canvasW - dw) / 2, (this.canvasH - dh) / 2, dw, dh);
+    }
+
+    render(force = false) {
+      const index = this.nearestLoaded(Math.round(this.currentFrame));
+      if (index === -1) return;
+      if (!force && index === this.drawnFrame) return;
+      this.drawCover(this.images[index]);
+      this.drawnFrame = index;
+    }
+
+    // ---------- Rolagem ----------
+    setTrackLength() {
+      const length = this.frameCount * CONFIG.pxPerFrame + window.innerHeight;
+      this.section.style.setProperty('--scroll-length', `${length}px`);
+    }
+
+    progress() {
+      const rect = this.section.getBoundingClientRect();
+      const scrollable = this.section.offsetHeight - window.innerHeight;
+      if (scrollable <= 0) return 0;
+      return Math.min(1, Math.max(0, -rect.top / scrollable));
+    }
+
+    updateCaptions(progress) {
+      for (const el of this.captions) {
+        const start = parseFloat(el.dataset.start);
+        const end = parseFloat(el.dataset.end);
+        el.classList.toggle('is-active', progress >= start && progress <= end);
+      }
+    }
+
+    onScroll() {
+      if (reduced) return;
+      const progress = this.progress();
+      this.targetFrame = progress * (this.frameCount - 1);
+      this.updateCaptions(progress);
+      this.section.classList.toggle('is-scrolled', progress > 0.01);
+      this.requestTick();
+    }
+
+    tick() {
+      this.rafId = 0;
+      const diff = this.targetFrame - this.currentFrame;
+
+      if (Math.abs(diff) < 0.05) this.currentFrame = this.targetFrame;
+      else this.currentFrame += diff * CONFIG.ease;
+
+      this.render();
+
+      // Continua animando até alcançar o alvo; depois para (sem rAF ocioso).
+      if (this.currentFrame !== this.targetFrame) this.requestTick();
+    }
+
+    requestTick() {
+      if (!this.rafId) this.rafId = requestAnimationFrame(this.tick);
+    }
+
+    // ---------- Modos (normal / movimento reduzido) ----------
+    applyMode() {
+      if (reduced) {
+        // Imagem estática, todas as legendas visíveis, sem trilho de rolagem.
+        this.section.style.removeProperty('--scroll-length');
+        this.targetFrame = this.currentFrame = this.reducedFrame;
+        this.captions.forEach((el) => el.classList.add('is-active'));
+        if (!this.loaded[this.reducedFrame]) this.loadFrame(this.reducedFrame);
+        this.updateLoader();
+      } else {
+        this.setTrackLength();
+        this.onScroll();
+        this.currentFrame = this.targetFrame; // sem "rebobinar" ao trocar de modo
+      }
+    }
   }
 
-  function requestTick() {
-    if (!rafId) rafId = requestAnimationFrame(tick);
-  }
+  // ---------- Inicialização ----------
+  const sequences = Array.from(document.querySelectorAll('.scrolly[data-frame-path]'))
+    .filter((section) => section.querySelector('.scrolly__canvas'))
+    .map((section) => new ScrollSequence(section));
 
-  // ---------- Modos (normal / movimento reduzido) ----------
+  if (!sequences.length) return;
+
+  // Só baixa os quadros de uma animação quando ela se aproxima da tela,
+  // para a segunda sequência não competir com a primeira no carregamento.
+  const preloadObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const seq = sequences.find((s) => s.section === entry.target);
+          preloadObserver.unobserve(entry.target);
+          if (seq && !reduced) seq.preloadAll();
+        }
+      }, { rootMargin: CONFIG.preloadMargin })
+    : null;
+
   function applyMode() {
     reduced = motionQuery.matches;
     root.classList.toggle('reduced-motion', reduced);
 
-    if (reduced) {
-      // Imagem estática, todas as legendas visíveis, sem trilho de rolagem.
-      section.style.removeProperty('--scroll-length');
-      const still = Math.min(CONFIG.frameCount, Math.max(1, CONFIG.reducedMotionFrame)) - 1;
-      targetFrame = currentFrame = still;
-      captions.forEach((el) => el.classList.add('is-active'));
-      if (!loaded[still]) loadFrame(still);
-      updateLoader();
-    } else {
-      const length = CONFIG.frameCount * CONFIG.pxPerFrame + window.innerHeight;
-      section.style.setProperty('--scroll-length', `${length}px`);
-      preloadAll();
-      onScroll();
-      currentFrame = targetFrame; // sem "rebobinar" ao trocar de modo
+    for (const seq of sequences) {
+      seq.applyMode();
+      if (reduced) continue;
+      if (preloadObserver && !seq.preloadStarted) preloadObserver.observe(seq.section);
+      else seq.preloadAll();
     }
 
-    // A altura do canvas muda entre os modos.
-    requestAnimationFrame(() => {
-      resizeCanvas();
-      render(true);
-    });
+    // A altura dos canvas muda entre os modos.
+    requestAnimationFrame(() => sequences.forEach((seq) => { seq.resize(); seq.render(true); }));
   }
 
-  // ---------- Inicialização ----------
-  function init() {
-    applyMode();
-    resizeCanvas();
+  applyMode();
+  sequences.forEach((seq) => seq.resize());
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', () => sequences.forEach((seq) => seq.onScroll()), { passive: true });
 
-    // Recalcula o trilho e o canvas quando a janela muda de tamanho.
-    let resizeTimer = 0;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
+  // Recalcula trilhos e canvas quando a janela muda de tamanho.
+  let resizeTimer = 0;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      for (const seq of sequences) {
         if (!reduced) {
-          const length = CONFIG.frameCount * CONFIG.pxPerFrame + window.innerHeight;
-          section.style.setProperty('--scroll-length', `${length}px`);
-          onScroll();
+          seq.setTrackLength();
+          seq.onScroll();
         }
-        resizeCanvas();
-      }, 100);
-    });
+        seq.resize();
+      }
+    }, 100);
+  });
 
-    if ('ResizeObserver' in window) {
-      new ResizeObserver(() => resizeCanvas()).observe(canvas);
-    }
-
-    // Usuário pode mudar a preferência com a página aberta.
-    if (motionQuery.addEventListener) motionQuery.addEventListener('change', applyMode);
-    else if (motionQuery.addListener) motionQuery.addListener(applyMode);
-
-    // Voltar do cache (bfcache) no Safari/iOS: garante o quadro correto.
-    window.addEventListener('pageshow', () => {
-      onScroll();
-      currentFrame = targetFrame;
-      render(true);
-    });
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(() => sequences.forEach((seq) => seq.resize()));
+    sequences.forEach((seq) => ro.observe(seq.canvas));
   }
 
-  init();
+  // Usuário pode mudar a preferência com a página aberta.
+  if (motionQuery.addEventListener) motionQuery.addEventListener('change', applyMode);
+  else if (motionQuery.addListener) motionQuery.addListener(applyMode);
+
+  // Voltar do cache (bfcache) no Safari/iOS: garante o quadro correto.
+  window.addEventListener('pageshow', () => {
+    for (const seq of sequences) {
+      seq.onScroll();
+      seq.currentFrame = seq.targetFrame;
+      seq.render(true);
+    }
+  });
 })();

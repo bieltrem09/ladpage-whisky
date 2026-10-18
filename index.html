@@ -22,13 +22,21 @@
 
   <main>
     <!--
-      Seção da animação. A altura (definida pelo JS via --scroll-length)
-      é o "trilho" de rolagem; o .scrolly__sticky fica preso na tela
-      enquanto o usuário percorre esse trilho.
+      Cada seção .scrolly é uma animação independente:
+        data-frame-path    caminho dos quadros ({n} vira 0001, 0002, ...)
+        data-frame-count   total de quadros
+        data-reduced-frame quadro fixo exibido com prefers-reduced-motion
+      A altura (definida pelo JS via --scroll-length) é o "trilho" de
+      rolagem; o .scrolly__sticky fica preso na tela enquanto o usuário
+      percorre esse trilho.
     -->
-    <section class="scrolly" id="scrolly" aria-label="Animação da lata flutuando acima das nuvens">
+    <section class="scrolly" id="nuvens"
+             data-frame-path="frames/frame-{n}.jpg"
+             data-frame-count="240"
+             data-reduced-frame="120"
+             aria-label="Animação da lata flutuando acima das nuvens">
       <div class="scrolly__sticky">
-        <canvas class="scrolly__canvas" id="scrolly-canvas" role="img"
+        <canvas class="scrolly__canvas" role="img"
                 aria-label="Lata de bebida girando e flutuando acima das nuvens"></canvas>
 
         <!-- Fallback sem JavaScript -->
@@ -57,9 +65,9 @@
           <span class="scroll-hint__line"></span>
         </div>
 
-        <div class="loader" id="loader" role="status" aria-live="polite">
-          <div class="loader__bar"><span id="loader-fill"></span></div>
-          <span class="loader__label" id="loader-label">Carregando 0%</span>
+        <div class="loader" role="status" aria-live="polite">
+          <div class="loader__bar"><span></span></div>
+          <span class="loader__label">Carregando 0%</span>
         </div>
       </div>
     </section>
@@ -68,9 +76,46 @@
       <div class="content__inner">
         <h2>Feita para quem vive nas alturas.</h2>
         <p>
-          Esta é a seção que aparece depois da animação. A partir daqui a página
-          rola normalmente — substitua este texto pelo conteúdo do seu site.
+          Entre as duas animações a página rola normalmente. Substitua este
+          texto pelo conteúdo do seu site.
         </p>
+      </div>
+    </section>
+
+    <!-- Segunda animação: comercial, 300 quadros em frames-commercial/ -->
+    <section class="scrolly" id="comercial"
+             data-frame-path="frames-commercial/frame-{n}.jpg"
+             data-frame-count="300"
+             data-reduced-frame="150"
+             aria-label="Animação comercial da lata girando entre as nuvens">
+      <div class="scrolly__sticky">
+        <canvas class="scrolly__canvas" role="img"
+                aria-label="Lata de bebida energética girando com gotas de água sobre as nuvens"></canvas>
+
+        <noscript>
+          <img class="scrolly__fallback" src="frames-commercial/frame-0150.jpg"
+               alt="Lata de bebida energética sobre as nuvens">
+        </noscript>
+
+        <div class="scrolly__overlay">
+          <p class="caption" data-start="0" data-end="0.24">
+            <span class="caption__eyebrow">Gelada de verdade</span>
+            <span class="caption__title">Cada gota<br>conta.</span>
+          </p>
+          <p class="caption" data-start="0.36" data-end="0.62">
+            <span class="caption__eyebrow">Lata de 350 ml</span>
+            <span class="caption__title">Abra.<br>Respire.</span>
+          </p>
+          <p class="caption" data-start="0.74" data-end="1">
+            <span class="caption__eyebrow">Raw Boost Light</span>
+            <span class="caption__title">Suba mais<br>alto.</span>
+          </p>
+        </div>
+
+        <div class="loader" role="status" aria-live="polite">
+          <div class="loader__bar"><span></span></div>
+          <span class="loader__label">Carregando 0%</span>
+        </div>
       </div>
     </section>
   </main>

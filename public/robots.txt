@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# [PLACEHOLDER] trocar pelo domínio real
+Sitemap: https://SEU-DOMINIO.com.br/sitemap.xml

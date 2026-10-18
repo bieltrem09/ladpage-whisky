@@ -1,0 +1,16 @@
+// Logo PROVISÓRIO: quadrado cobalto com "R" branco + "RAW BOOST".
+// [PLACEHOLDER] trocar pelo SVG oficial quando existir.
+export default function Logo({ tone = 'navy', className = '' }) {
+  return (
+    <span className={`logo logo--${tone} ${className}`}>
+      <svg className="logo__mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect width="32" height="32" rx="7" fill="#0B4FD8" />
+        <path
+          d="M10 24V8h7.2c3.4 0 5.6 1.9 5.6 4.9 0 2.2-1.2 3.8-3.2 4.5L23.4 24h-4.3l-3.3-6.1h-1.9V24H10Zm3.9-9.2h3c1.3 0 2-.7 2-1.8s-.7-1.8-2-1.8h-3v3.6Z"
+          fill="#fff"
+        />
+      </svg>
+      <span className="logo__word">RAW BOOST</span>
+    </span>
+  );
+}

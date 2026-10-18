@@ -1,129 +1,97 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Raw Boost — Acima das nuvens</title>
-  <meta name="description" content="Animação de rolagem quadro a quadro em canvas.">
-  <meta name="theme-color" content="#0b1a2b">
-
-  <!-- Primeiro quadro carregado com prioridade: aparece antes do JS terminar -->
-  <link rel="preload" as="image" href="frames/frame-0001.jpg" fetchpriority="high">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
-  <header class="site-header">
-    <a class="brand" href="#">RAW BOOST</a>
-    <nav aria-label="Principal">
-      <a href="#sobre">Sobre</a>
-    </nav>
-  </header>
-
-  <main>
-    <!--
-      Cada seção .scrolly é uma animação independente:
-        data-frame-path    caminho dos quadros ({n} vira 0001, 0002, ...)
-        data-frame-count   total de quadros
-        data-reduced-frame quadro fixo exibido com prefers-reduced-motion
-      A altura (definida pelo JS via --scroll-length) é o "trilho" de
-      rolagem; o .scrolly__sticky fica preso na tela enquanto o usuário
-      percorre esse trilho.
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Raw Boost Light — energético 100% natural</title>
+    <meta name="description" content="Raw Boost Light: energy drink em lata de 330 ml com fórmula 100% natural. Abra gelado e siga no seu ritmo." />
+    <meta name="theme-color" content="#EAF2FA" />
+    <!-- [PLACEHOLDER] descomente com o domínio real:
+    <link rel="canonical" href="https://SEU-DOMINIO.com.br/" />
     -->
-    <section class="scrolly" id="nuvens"
-             data-frame-path="frames/frame-{n}.jpg"
-             data-frame-count="240"
-             data-reduced-frame="120"
-             aria-label="Animação da lata flutuando acima das nuvens">
-      <div class="scrolly__sticky">
-        <canvas class="scrolly__canvas" role="img"
-                aria-label="Lata de bebida girando e flutuando acima das nuvens"></canvas>
 
-        <!-- Fallback sem JavaScript -->
-        <noscript>
-          <img class="scrolly__fallback" src="frames/frame-0001.jpg"
-               alt="Lata de bebida flutuando acima das nuvens">
-        </noscript>
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="Raw Boost" />
+    <meta property="og:title" content="Raw Boost Light — energético 100% natural" />
+    <meta property="og:description" content="Energy drink de 330 ml com fórmula 100% natural. Abra gelado e siga no seu ritmo." />
+    <!-- [PLACEHOLDER] use a URL absoluta quando houver domínio: https://SEU-DOMINIO.com.br/og-image.jpg -->
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Lata Raw Boost Light flutuando acima das nuvens" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Raw Boost Light — energético 100% natural" />
+    <meta name="twitter:description" content="Energy drink de 330 ml com fórmula 100% natural." />
+    <meta name="twitter:image" content="/og-image.jpg" />
 
-        <div class="scrolly__overlay">
-          <p class="caption" data-start="0" data-end="0.22">
-            <span class="caption__eyebrow">Raw Boost Light</span>
-            <span class="caption__title">Leve como<br>uma nuvem.</span>
-          </p>
-          <p class="caption" data-start="0.32" data-end="0.58">
-            <span class="caption__eyebrow">Energia limpa</span>
-            <span class="caption__title">Zero açúcar.<br>Todo o gás.</span>
-          </p>
-          <p class="caption" data-start="0.68" data-end="1">
-            <span class="caption__eyebrow">100% natural</span>
-            <span class="caption__title">Eleve o<br>seu dia.</span>
-          </p>
-        </div>
+    <!-- LCP: primeiro quadro do filme do hero -->
+    <link rel="preload" as="image" type="image/webp" href="./frames/hero/001.webp" fetchpriority="high" />
 
-        <div class="scroll-hint" aria-hidden="true">
-          <span>Role</span>
-          <span class="scroll-hint__line"></span>
-        </div>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 
-        <div class="loader" role="status" aria-live="polite">
-          <div class="loader__bar"><span></span></div>
-          <span class="loader__label">Carregando 0%</span>
-        </div>
-      </div>
-    </section>
+    <!-- Fontes sem bloquear a renderização (display=swap + carga assíncrona) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+      <style>.boot-poster { display: none; }</style>
+    </noscript>
 
-    <section class="content" id="sobre">
-      <div class="content__inner">
-        <h2>Feita para quem vive nas alturas.</h2>
-        <p>
-          Entre as duas animações a página rola normalmente. Substitua este
-          texto pelo conteúdo do seu site.
-        </p>
-      </div>
-    </section>
+    <!-- Primeiro quadro em HTML puro: pinta antes do React (LCP). O hero
+         renderizado por cima o cobre; o main.jsx o remove depois. -->
+    <style>
+      body { margin: 0; background: #eaf2fa; }
+      .boot-poster {
+        position: absolute; top: 0; left: 0; z-index: 0;
+        width: 100%; height: max(380px, 62svh);
+        object-fit: cover; object-position: 60% 50%;
+      }
+      @media (min-width: 761px) and (min-aspect-ratio: 1/1) {
+        .boot-poster { height: 100svh; min-height: 640px; max-height: 1100px; }
+      }
+    </style>
 
-    <!-- Segunda animação: comercial, 300 quadros em frames-commercial/ -->
-    <section class="scrolly" id="comercial"
-             data-frame-path="frames-commercial/frame-{n}.jpg"
-             data-frame-count="300"
-             data-reduced-frame="150"
-             aria-label="Animação comercial da lata girando entre as nuvens">
-      <div class="scrolly__sticky">
-        <canvas class="scrolly__canvas" role="img"
-                aria-label="Lata de bebida energética girando com gotas de água sobre as nuvens"></canvas>
-
-        <noscript>
-          <img class="scrolly__fallback" src="frames-commercial/frame-0150.jpg"
-               alt="Lata de bebida energética sobre as nuvens">
-        </noscript>
-
-        <div class="scrolly__overlay">
-          <p class="caption" data-start="0" data-end="0.24">
-            <span class="caption__eyebrow">Gelada de verdade</span>
-            <span class="caption__title">Cada gota<br>conta.</span>
-          </p>
-          <p class="caption" data-start="0.36" data-end="0.62">
-            <span class="caption__eyebrow">Lata de 350 ml</span>
-            <span class="caption__title">Abra.<br>Respire.</span>
-          </p>
-          <p class="caption" data-start="0.74" data-end="1">
-            <span class="caption__eyebrow">Raw Boost Light</span>
-            <span class="caption__title">Suba mais<br>alto.</span>
-          </p>
-        </div>
-
-        <div class="loader" role="status" aria-live="polite">
-          <div class="loader__bar"><span></span></div>
-          <span class="loader__label">Carregando 0%</span>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p>&copy; 2026 Raw Boost</p>
-  </footer>
-
-  <script src="script.js" defer></script>
-</body>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Raw Boost Light",
+        "brand": { "@type": "Brand", "name": "Raw Boost" },
+        "description": "Energy drink em lata de 330 ml, linha Light, com fórmula 100% natural conforme o rótulo.",
+        "image": "/og-image.jpg",
+        "category": "Energy drink"
+      }
+    </script>
+  </head>
+  <body>
+    <img
+      class="boot-poster"
+      src="./frames/hero/001.webp"
+      alt=""
+      aria-hidden="true"
+      width="1600"
+      height="900"
+      fetchpriority="high"
+    />
+    <div id="root"></div>
+    <noscript>
+      <img
+        src="./hero-poster.webp"
+        alt="Lata Raw Boost Light em pé, flutuando acima das nuvens"
+        style="display:block;width:100%;height:100svh;object-fit:cover"
+      />
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
